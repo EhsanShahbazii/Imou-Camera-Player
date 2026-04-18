@@ -1,0 +1,49 @@
+# Media & Surveillance Data (Strictly Excluded)
+files/
+*.dav
+*.idx
+*.mp4
+*.mkv
+*.avi
+*.mov
+*.jpg
+*.jpeg
+*.png
+!assets/**
+!docs/**
+
+# Dependencies & Build Outputs
+node_modules/
+dist/
+build/
+out/
+release/
+*.dmg
+*.exe
+*.AppImage
+*.deb
+*.zip
+*.tar.gz
+
+# Cache & Temporary Directories
+.cache/
+tmp/
+temp/
+
+# OS Specific
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Secrets & Environment
+.env
+.env.*
+*.local
+*.pem
+*.key
+*.cert
+scratch/
