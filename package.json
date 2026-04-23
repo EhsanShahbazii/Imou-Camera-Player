@@ -1,0 +1,9 @@
+{
+  "name": "cctv-viewer",
+  "version": "0.1.0",
+  "description": "Surveillance footage viewer",
+  "main": "src/main/index.js",
+  "scripts": {
+    "start": "electron ."
+  }
+}
