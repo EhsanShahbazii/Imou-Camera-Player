@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CCTV Footage Viewer</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="window-container">
+    <!-- macOS Titlebar / Header -->
+    <header class="titlebar">
+      <div class="traffic-lights-spacer"></div>
+
+      <div class="folder-picker-bar">
+        <button id="btn-change-folder" class="mac-btn mac-btn-secondary" title="Change folder">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+          </svg>
+          <span id="current-folder-name">files</span>
+        </button>
+      </div>
+
+      <div class="view-switch-segmented">
+        <button id="tab-timeline" class="segment-btn active">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+          </svg>
+          Timeline & Player
+        </button>
+        <button id="tab-photos" class="segment-btn">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+            <polyline points="21 15 16 10 5 21"></polyline>
+          </svg>
+          Motion Snapshots (<span id="snapshots-count-badge">0</span>)
+        </button>
+      </div>
+
+      <div class="titlebar-right">
+        <span id="status-badge" class="badge">Ready</span>
+      </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <div class="workspace">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="sidebar-section">
+          <div class="sidebar-section-title">Dates</div>
+          <div id="dates-list" class="sidebar-list">
+            <!-- Dynamic dates will be populated here -->
+          </div>
+        </div>
+
+        <div class="sidebar-section">
+          <div class="sidebar-section-title">Filter Events</div>
+          <div class="filter-pills">
+            <button class="filter-pill active" data-filter="all">All</button>
+            <button class="filter-pill" data-filter="motion">Motion [M]</button>
+            <button class="filter-pill" data-filter="regular">Regular [R]</button>
+          </div>
+        </div>
+
+        <div class="sidebar-section clips-section">
+          <div class="sidebar-section-title">
+            <span>Segments</span>
+            <span id="clips-count" class="count-tag">0</span>
+          </div>
+          <div id="clips-list" class="sidebar-list clips-scroll">
+            <!-- Clips list populated dynamically -->
+          </div>
+        </div>
+      </aside>
+
+      <!-- Main Stage -->
+      <main class="stage">
+        <!-- View 1: Timeline & Video Player -->
+        <div id="view-timeline" class="view-panel active">
+          <div class="player-container">
+            <video id="main-video" preload="auto" playsinline></video>
+            
+            <!-- Video Overlay Info -->
+            <div class="video-overlay-info">
+              <span id="overlay-date" class="overlay-tag">--</span>
+              <span id="overlay-time" class="overlay-tag highlight">00:00:00</span>
+              <span id="overlay-type" class="overlay-tag type-tag">Regular</span>
+            </div>
+
+            <!-- Flash effect for snapshots -->
+            <div id="snapshot-flash" class="flash-overlay"></div>
+
+            <!-- Loading Spinner -->
+            <div id="player-spinner" class="spinner-overlay hidden">
+              <div class="mac-spinner"></div>
+              <span>Remuxing & Loading...</span>
+            </div>
+
+            <!-- Floating macOS Glass Controls -->
+            <div class="glass-controls">
+              <div class="controls-left">
+                <button id="btn-prev-clip" class="ctrl-btn" title="Previous Segment (Shift + Left)">
+                  <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+                </button>
+                <button id="btn-backward-10" class="ctrl-btn" title="Backward 10s (Left Arrow)">
+                  <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 4v6h6m-3.5 10a9 9 0 1 0-1.8-9.4"/></svg>
+                  <span class="ctrl-subtext">10</span>
+                </button>
+                <button id="btn-play-pause" class="ctrl-btn play-btn" title="Play/Pause (Space)">
+                  <svg id="icon-play" class="icon" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                  <svg id="icon-pause" class="icon hidden" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
+                </button>
+                <button id="btn-forward-10" class="ctrl-btn" title="Forward 10s (Right Arrow)">
+                  <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6m3.5 10a9 9 0 1 1 1.8-9.4"/></svg>
+                  <span class="ctrl-subtext">10</span>
+                </button>
+                <button id="btn-next-clip" class="ctrl-btn" title="Next Segment (Shift + Right)">
+                  <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+                </button>
+              </div>
+
+              <div class="controls-center">
+                <div class="segment-scrubber-container">
+                  <span id="current-clip-time" class="time-label">00:00</span>
+                  <input type="range" id="clip-scrubber" min="0" max="300" step="0.1" value="0">
+                  <span id="current-clip-duration" class="time-label">05:00</span>
+                </div>
+              </div>
+
+              <div class="controls-right">
+                <button id="btn-speed" class="pill-btn" title="Playback Speed">1.0x</button>
+                <button id="btn-flip" class="ctrl-btn active" title="Flip 180° (R)">
+                  <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+                  </svg>
+                </button>
+                <button id="btn-snapshot" class="ctrl-btn" title="Take Snapshot (S)">
+                  <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                </button>
+                <button id="btn-export" class="ctrl-btn" title="Export as MP4">
+                  <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                </button>
+                <button id="btn-fullscreen" class="ctrl-btn" title="Toggle Fullscreen">
+                  <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 24-Hour Timeline Bar -->
+          <div class="timeline-panel">
+            <div class="timeline-header">
+              <span class="timeline-title">24-Hour Daily Timeline</span>
+              <span id="timeline-hover-time" class="timeline-hover-indicator">--:--:--</span>
+            </div>
+            
+            <div id="timeline-track-wrapper" class="timeline-track-wrapper">
+              <!-- Ruler hours (00 to 24) -->
+              <div class="timeline-ruler">
+                <span style="left: 0%">00:00</span>
+                <span style="left: 8.33%">02:00</span>
+                <span style="left: 16.66%">04:00</span>
+                <span style="left: 25%">06:00</span>
+                <span style="left: 33.33%">08:00</span>
+                <span style="left: 41.66%">10:00</span>
+                <span style="left: 50%">12:00</span>
+                <span style="left: 58.33%">14:00</span>
+                <span style="left: 66.66%">16:00</span>
+                <span style="left: 75%">18:00</span>
+                <span style="left: 83.33%">20:00</span>
+                <span style="left: 91.66%">22:00</span>
+                <span style="left: 100%">24:00</span>
+              </div>
+
+              <!-- Interactive bar with segments -->
+              <div id="timeline-bar" class="timeline-bar">
+                <!-- Recorded video blocks dynamically injected -->
+                <div id="timeline-segments-layer"></div>
+                <!-- Motion detection markers injected -->
+                <div id="timeline-motion-layer"></div>
+                <!-- Needle indicator -->
+                <div id="timeline-needle" class="timeline-needle">
+                  <div class="needle-tip"></div>
+                </div>
+              </div>
+
+              <!-- Tooltip on hover -->
+              <div id="timeline-tooltip" class="timeline-tooltip hidden">
+                <div class="tooltip-time">00:00:00</div>
+                <div class="tooltip-type">Regular</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- View 2: Motion Snapshots Gallery -->
+        <div id="view-photos" class="view-panel">
+          <div class="photos-header">
+            <h2>Motion Detection Snapshots</h2>
+            <span class="photos-sub">Captured snapshots triggered by camera motion sensor</span>
+          </div>
+          <div id="photos-grid" class="photos-grid">
+            <!-- Dynamic photo thumbnails -->
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- Lightbox Modal for Photo Zoom -->
+    <div id="photo-modal" class="modal-overlay hidden">
+      <div class="modal-content">
+        <button id="modal-close" class="modal-close-btn">&times;</button>
+        <img id="modal-img" src="" alt="Snapshot">
+        <div class="modal-meta">
+          <span id="modal-time">--</span>
+          <div class="modal-actions">
+            <button id="modal-btn-finder" class="mac-btn mac-btn-secondary">Show in Finder</button>
+            <button id="modal-btn-download" class="mac-btn mac-btn-primary">Save Image...</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
