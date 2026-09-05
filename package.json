@@ -1,9 +1,87 @@
 {
   "name": "cctv-viewer",
-  "version": "0.1.0",
-  "description": "Surveillance footage viewer",
+  "productName": "CCTV Viewer",
+  "version": "1.0.0",
+  "description": "High-performance desktop CCTV DAV footage player and motion snapshot viewer",
   "main": "src/main/index.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder",
+    "build:mac": "electron-builder --mac",
+    "build:mac:arm64": "electron-builder --mac --arm64",
+    "build:mac:x64": "electron-builder --mac --x64",
+    "build:win": "electron-builder --win",
+    "build:win:portable": "electron-builder --win portable",
+    "build:linux": "electron-builder --linux",
+    "build:linux:appimage": "electron-builder --linux AppImage",
+    "build:linux:deb": "electron-builder --linux deb",
+    "build:all": "electron-builder -mwl"
+  },
+  "author": {
+    "name": "Ehsan Shahbazi",
+    "email": "ehsan.shahbazipc@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/EhsanShahbazii/cctv-viewer.git"
+  },
+  "keywords": [
+    "cctv",
+    "dav",
+    "dahua",
+    "imou",
+    "surveillance",
+    "security-camera",
+    "electron",
+    "macos",
+    "windows",
+    "linux",
+    "video-player"
+  ],
+  "license": "MIT",
+  "type": "commonjs",
+  "build": {
+    "appId": "com.ehsanshahbazi.cctvviewer",
+    "productName": "CCTV Viewer",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "src/**/*",
+      "package.json"
+    ],
+    "mac": {
+      "category": "public.app-category.video",
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false
+    },
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ]
+    },
+    "linux": {
+      "category": "Video",
+      "target": [
+        "AppImage",
+        "deb"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    }
+  },
+  "devDependencies": {
+    "electron": "^44.7.2",
+    "electron-builder": "^26.15.3"
   }
 }
