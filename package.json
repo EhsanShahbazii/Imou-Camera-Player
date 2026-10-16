@@ -49,9 +49,11 @@
     },
     "files": [
       "src/**/*",
+      "assets/**/*",
       "package.json"
     ],
     "mac": {
+      "icon": "assets/icon.icns",
       "category": "public.app-category.video",
       "target": [
         "dmg",
@@ -61,12 +63,14 @@
       "gatekeeperAssess": false
     },
     "win": {
+      "icon": "assets/icon.ico",
       "target": [
         "nsis",
         "portable"
       ]
     },
     "linux": {
+      "icon": "assets/icon.png",
       "category": "Video",
       "target": [
         "AppImage",

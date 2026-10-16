@@ -22,6 +22,9 @@ const btnForward = document.getElementById('btn-forward-10');
 const btnPrevClip = document.getElementById('btn-prev-clip');
 const btnNextClip = document.getElementById('btn-next-clip');
 const btnSpeed = document.getElementById('btn-speed');
+const btnVolume = document.getElementById('btn-volume');
+const iconVolOn = document.getElementById('icon-vol-on');
+const iconVolMute = document.getElementById('icon-vol-mute');
 const btnFlip = document.getElementById('btn-flip');
 const btnSnapshot = document.getElementById('btn-snapshot');
 const btnExport = document.getElementById('btn-export');
@@ -481,6 +484,15 @@ function setupEventListeners() {
     video.playbackRate = speed;
   });
 
+  // Volume & Mute Toggle
+  if (btnVolume) {
+    btnVolume.addEventListener('click', () => {
+      video.muted = !video.muted;
+      iconVolOn.classList.toggle('hidden', video.muted);
+      iconVolMute.classList.toggle('hidden', !video.muted);
+    });
+  }
+
   // Flip Toggle
   if (btnFlip) {
     btnFlip.addEventListener('click', () => {
@@ -622,6 +634,9 @@ function setupEventListeners() {
       } else {
         btnForward.click();
       }
+    } else if (e.key === 'm' || e.key === 'M') {
+      e.preventDefault();
+      if (btnVolume) btnVolume.click();
     } else if (e.key === 's' || e.key === 'S') {
       e.preventDefault();
       captureVideoSnapshot();
@@ -634,6 +649,43 @@ function setupEventListeners() {
     } else if (e.key === 'Escape') {
       if (!photoModal.classList.contains('hidden')) {
         photoModal.classList.add('hidden');
+      }
+    }
+  });
+
+  // Native Menu Listeners
+  if (window.electronAPI.onLoadFolder) {
+    window.electronAPI.onLoadFolder(async (folder) => {
+      if (folder) {
+        currentFolder = folder;
+        folderNameLabel.textContent = currentFolder.split(/[\\/]/).pop() || 'Folder';
+        await loadAndScanFolder(currentFolder);
+      }
+    });
+  }
+
+  if (window.electronAPI.onTriggerFlip) {
+    window.electronAPI.onTriggerFlip(() => {
+      setFlipState(!isFlipped);
+    });
+  }
+
+  // Drag and Drop folder support
+  window.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+  });
+
+  window.addEventListener('drop', async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      const droppedFile = e.dataTransfer.files[0];
+      const targetPath = droppedFile.path;
+      if (targetPath) {
+        currentFolder = targetPath;
+        folderNameLabel.textContent = currentFolder.split(/[\\/]/).pop() || 'Folder';
+        await loadAndScanFolder(currentFolder);
       }
     }
   });

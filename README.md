@@ -170,6 +170,7 @@ npm run build:all
 | <kbd>Shift</kbd> + <kbd>←</kbd> | Previous 5-Minute Segment |
 | <kbd>Shift</kbd> + <kbd>→</kbd> | Next 5-Minute Segment |
 | <kbd>R</kbd> | Toggle 180° Inverted Orientation |
+| <kbd>M</kbd> | Toggle Audio Mute / Unmute |
 | <kbd>S</kbd> | Capture High-Resolution Snapshot |
 | <kbd>F</kbd> | Toggle Fullscreen Mode |
 | <kbd>Esc</kbd> | Close Photo Lightbox / Exit Fullscreen |
