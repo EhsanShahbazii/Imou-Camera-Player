@@ -12,6 +12,14 @@
 
 **A sleek, native desktop application engineered to effortlessly browse, scrub, and stream CCTV surveillance recordings (`.dav` / Dahua / Imou / Hikvision) and motion detection snapshots (`.jpg`).**
 
+<br/>
+
+<p align="center">
+  <img src="assets/banner.png" alt="CCTV Viewer Preview" width="850" style="border-radius: 12px; box-shadow: 0 16px 40px rgba(0,0,0,0.5);">
+</p>
+
+<br/>
+
 [Key Features](#-key-features) • [Architecture](#-architecture) • [Getting Started](#-getting-started) • [Cross-Platform Builds](#-cross-platform-builds--releases) • [Keyboard Shortcuts](#-keyboard-shortcuts)
 
 </div>
