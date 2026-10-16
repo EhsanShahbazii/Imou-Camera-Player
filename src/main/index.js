@@ -145,7 +145,7 @@ function setupAppMenu() {
         {
           label: 'GitHub Repository',
           click: async () => {
-            await shell.openExternal('https://github.com/EhsanShahbazii/cctv-viewer');
+            await shell.openExternal('https://github.com/EhsanShahbazii/Imou-Camera-Player');
           }
         }
       ]

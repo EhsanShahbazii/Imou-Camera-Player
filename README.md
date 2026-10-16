@@ -98,8 +98,8 @@ flowchart TD
 ### Installation
 ```bash
 # Clone the repository
-git clone https://github.com/EhsanShahbazii/cctv-viewer.git
-cd cctv-viewer
+git clone https://github.com/EhsanShahbazii/Imou-Camera-Player.git
+cd Imou-Camera-Player
 
 # Install dependencies
 npm install
