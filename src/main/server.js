@@ -6,8 +6,10 @@ const { spawn } = require('child_process');
 
 class MediaServer {
   constructor(options = {}) {
-    this.cacheDir = options.cacheDir || path.resolve(__dirname, '../../.cache/mp4');
-    this.thumbDir = options.thumbDir || path.resolve(__dirname, '../../.cache/thumbnails');
+    const os = require('os');
+    const defaultDataDir = path.join(os.tmpdir(), 'cctv-viewer-cache');
+    this.cacheDir = options.cacheDir || path.join(defaultDataDir, 'mp4');
+    this.thumbDir = options.thumbDir || path.join(defaultDataDir, 'thumbnails');
     this.port = 0;
     this.server = null;
     this.inFlightConversions = new Map();

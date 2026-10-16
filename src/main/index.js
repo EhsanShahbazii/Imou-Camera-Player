@@ -5,6 +5,13 @@ const { spawn } = require('child_process');
 const MediaServer = require('./server');
 const { scanDirectory } = require('./scanner');
 
+// Ensure standard and Homebrew binary paths are available on macOS GUI
+if (process.platform === 'darwin') {
+  const standardPaths = ['/opt/homebrew/bin', '/opt/homebrew/sbin', '/usr/local/bin', '/usr/local/sbin', '/usr/bin', '/bin'];
+  const currentPath = process.env.PATH ? process.env.PATH.split(':') : [];
+  process.env.PATH = Array.from(new Set([...standardPaths, ...currentPath])).filter(Boolean).join(':');
+}
+
 app.name = 'CCTV Viewer';
 
 // Enable hardware decoding & HEVC acceleration
@@ -15,7 +22,9 @@ let mainWindow = null;
 let mediaServer = null;
 
 async function createWindow() {
-  mediaServer = new MediaServer();
+  const cacheDir = path.join(app.getPath('userData'), 'cache', 'mp4');
+  const thumbDir = path.join(app.getPath('userData'), 'cache', 'thumbnails');
+  mediaServer = new MediaServer({ cacheDir, thumbDir });
   await mediaServer.start();
 
   const iconPath = path.join(__dirname, '../../assets/icon.png');
